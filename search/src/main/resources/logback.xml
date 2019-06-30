@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 seconds">
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{HH:mm} %-5level %logger{48} - %msg%n</Pattern>
+        </layout>
+    </appender>
+    <appender name="rolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/home/logs/search.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>/home/logs/search-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{56} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <!-- Application Loggers -->
+    <logger name="com.test.search" level="DEBUG" />
+
+    <!-- 3rdparty Loggers -->
+    <logger name="org.springframework" level="INFO" />
+    <logger name="org.springframework.web" level="DEBUG" />
+    <logger name="org.springframework.mvc" level="DEBUG" />
+    <logger name="org.apache" level="INFO" />
+
+    <root level="DEBUG">
+        <appender-ref ref="console" />
+        <appender-ref ref="rolling" />
+    </root>
+</configuration>
