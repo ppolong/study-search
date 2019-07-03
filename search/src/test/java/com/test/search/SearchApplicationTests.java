@@ -35,6 +35,8 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SearchApplicationTests extends HttpServlet {
 
+    private String userId;
+
     private String keyword;
 
     private HttpServletRequest httpServletRequest = null;
@@ -54,9 +56,7 @@ public class SearchApplicationTests extends HttpServlet {
                 .webAppContextSetup(context)
                 .apply(springSecurity())
                 .build();
-        httpServletRequest = Mockito.mock(HttpServletRequest.class);
-        Mockito.when(httpServletRequest.getRemoteUser())
-                .thenReturn("admin");
+        userId = "admin";
         keyword = "판교";
     }
 
@@ -116,7 +116,7 @@ public class SearchApplicationTests extends HttpServlet {
 
     @Test
     public void dCallSearch() {
-        ResponseEntity<Map> result = (ResponseEntity<Map>) keywordService.getAjaxSearch(keyword, PageRequest.of(1, 10), httpServletRequest);
+        ResponseEntity<Map> result = (ResponseEntity<Map>) keywordService.getAjaxSearch(keyword, PageRequest.of(1, 10), userId);
 
         assertTrue(Objects.requireNonNull(result.getBody()).size() > 0);
         assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -141,10 +141,10 @@ public class SearchApplicationTests extends HttpServlet {
     }
     @Test
     public void fCallSearchHistory() {
-        Page<KeywordHistory> result = (Page<KeywordHistory>) keywordService.getAjaxSearchHistoryByUserId(PageRequest.of(1, 10), httpServletRequest);
+        Page<KeywordHistory> result = (Page<KeywordHistory>) keywordService.getAjaxSearchHistoryByUserId(PageRequest.of(1, 10), userId);
         assertEquals(10, result.getContent().size());
         dCallSearch();
-        result = (Page<KeywordHistory>) keywordService.getAjaxSearchHistoryByUserId(PageRequest.of(1, 15), httpServletRequest);
+        result = (Page<KeywordHistory>) keywordService.getAjaxSearchHistoryByUserId(PageRequest.of(1, 15), userId);
         assertEquals(10, result.getContent().size());
     }
 }
