@@ -4,6 +4,7 @@ import com.test.search.dao.KeywordCountDao;
 import com.test.search.dao.KeywordHistoryDao;
 import com.test.search.domain.KeywordCount;
 import com.test.search.domain.KeywordHistory;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,9 @@ public class KeywordService {
     private KeywordHistoryDao keywordHistoryDao;
 
     public Object getAjaxSearch(String keyword, Pageable pageable, HttpServletRequest httpServletRequest){
+        if(Strings.isBlank(keyword) || (pageable.getPageNumber() < 1 || pageable.getPageNumber() > 45) || (pageable.getPageSize() < 1 || pageable.getPageSize() > 15)){
+            return null;
+        }
         String userId = httpServletRequest.getRemoteUser();
 
         int page = (pageable.getPageNumber() <= 0) ? 1 : (pageable.getPageNumber());

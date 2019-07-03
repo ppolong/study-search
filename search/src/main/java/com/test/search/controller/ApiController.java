@@ -12,14 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class ApiController {
 
-    private final KeywordService keywordService;
-
-    public ApiController(KeywordService keywordService) {
-        this.keywordService = keywordService;
-    }
+    @Autowired
+    private KeywordService keywordService;
 
     @GetMapping(value = "/api/search")
-    public Object getAjaxSearch(@RequestParam(value= "keyword") String keyword, Pageable pageable, HttpServletRequest httpServletRequest) {
+    public Object getAjaxSearch(@RequestParam(value= "keyword", defaultValue = "") String keyword, Pageable pageable, HttpServletRequest httpServletRequest) {
         return keywordService.getAjaxSearch(keyword, pageable, httpServletRequest);
     }
     @GetMapping(value = "/api/search/history")
