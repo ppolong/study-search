@@ -19,7 +19,7 @@ public class ApiController extends BaseController {
     }
 
     @GetMapping(value = "/api/search")
-    public Object getAjaxSearch(@RequestParam(value = "keyword") String keyword, Pageable pageable) {
+    public Object getAjaxSearch(@RequestParam(value = "keyword", defaultValue = "") String keyword, Pageable pageable) {
         Optional<String> userName = getUserName();
         if (!userName.isPresent()) {
             throw new IllegalStateException("not found user");

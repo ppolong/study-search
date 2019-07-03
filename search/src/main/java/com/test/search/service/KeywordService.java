@@ -4,6 +4,7 @@ import com.test.search.dao.KeywordCountDao;
 import com.test.search.dao.KeywordHistoryDao;
 import com.test.search.domain.KeywordCount;
 import com.test.search.domain.KeywordHistory;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.PageRequest;
@@ -30,21 +31,24 @@ public class KeywordService {
         this.keywordHistoryDao = keywordHistoryDao;
     }
 
+    public Object getAjaxSearch(String keyword, Pageable pageable, String userId) {
 
-    public Object getAjaxSearch(String keyword, Pageable pageable, String userId){
+        if (Strings.isBlank(keyword) || (pageable.getPageNumber() < 1 || pageable.getPageNumber() > 45) || (pageable.getPageSize() < 1 || pageable.getPageSize() > 15)) {
+            return null;
+        }
 
         int page = (pageable.getPageNumber() <= 0) ? 1 : (pageable.getPageNumber());
 
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("Authorization","KakaoAK 63dfc38052c3d4f47c06b6a08f71d56f");
+        httpHeaders.set("Authorization", "KakaoAK 63dfc38052c3d4f47c06b6a08f71d56f");
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("?query="+keyword);
-        stringBuilder.append("&page="+page);
+        stringBuilder.append("?query=" + keyword);
+        stringBuilder.append("&page=" + page);
 
-        ResponseEntity<Map> responseEntity = restTemplate.exchange(keywordSearchUrl+stringBuilder.toString(), HttpMethod.GET, new HttpEntity(httpHeaders), Map.class);
+        ResponseEntity<Map> responseEntity = restTemplate.exchange(keywordSearchUrl + stringBuilder.toString(), HttpMethod.GET, new HttpEntity(httpHeaders), Map.class);
 
-        if( responseEntity.getStatusCode() == HttpStatus.OK ){
+        if (responseEntity.getStatusCode() == HttpStatus.OK) {
             keywordCountDao.save(new KeywordCount(keyword, 1));
             keywordHistoryDao.save(new KeywordHistory(userId, keyword, LocalDateTime.now()));
         }
