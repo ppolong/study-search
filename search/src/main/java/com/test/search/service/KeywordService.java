@@ -49,7 +49,8 @@ public class KeywordService {
         ResponseEntity<Map> responseEntity = restTemplate.exchange(keywordSearchUrl + stringBuilder.toString(), HttpMethod.GET, new HttpEntity(httpHeaders), Map.class);
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            keywordCountDao.save(new KeywordCount(keyword, 1));
+            KeywordCount keywordCount = keywordCountDao.findByKeywordEquals(keyword);
+            keywordCountDao.save(new KeywordCount(keyword, keywordCount == null ? 1 : (keywordCount.getCount()+1)));
             keywordHistoryDao.save(new KeywordHistory(userId, keyword, LocalDateTime.now()));
         }
 

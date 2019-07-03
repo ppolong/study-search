@@ -2,18 +2,26 @@
     <div th:if="${#httpServletRequest.remoteUser != null}">
         <div class="sidebar-header">
             <span th:inline="text">[[${#httpServletRequest.remoteUser}]] 님</span>
+            <br />
             <form th:action="@{/logout}" method="post">
                 <input type="submit" class="btn btn-primary" value="Sign Out"/>
             </form>
+            <br />
         </div>
+        <br />
         <ul id="category" class="list-unstyled components">
             <li class="active">
                 <ul class="list-unstyled" id="homeSubmenu">
                     <li>
-                        <a href="api/search/count">인기 키워드 목록</a>
+                        <a href="/main">키워드 검색</a>
                     </li>
+                    <br />
                     <li>
-                        <a href="api/search/history">검색 히스토리</a>
+                        <a href="/history_count">인기 키워드 목록</a>
+                    </li>
+                    <br />
+                    <li>
+                        <a href="/history">검색 히스토리</a>
                     </li>
                 </ul>
             </li>

@@ -13,6 +13,8 @@
                 <th scope="col">장소명</th>
                 <th scope="col">도로명</th>
                 <th scope="col">지번</th>
+                <th scope="col">상세</th>
+                <th scope="col">지도</th>
             </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -20,11 +22,65 @@
     </div>
     <nav aria-label="..." style="text-align: center;" id="tableNav"></nav>
 
+    <!-- detail Modal -->
+    <div class="modal fade bd-example-modal-xl" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content" style="height: 800px">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- map Modal -->
+    <div class="modal fade bd-example-modal-xl" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content" style="height: 800px">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel2">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <th:block layout:fragment="script">
         <script type="text/javascript">
             $(document).ready(function () {
                 $("#keyword_search").click(function() {
                     searchKeyword($("#keyword").val(), 1);
+                });
+                $('#exampleModal').on('show.bs.modal', function (event) {
+                    var button = $(event.relatedTarget)
+                    var recipient = button.data('whatever')
+
+                    var modal = $(this)
+                    modal.find('.modal-title').text('상세');
+                    modal.find('.modal-body').html("<iframe src=\""+recipient+"\" style=\"zoom:0.60\" frameborder=\"0\" height=\"100%\" width=\"100%\"></iframe>")
+                });
+                $('#exampleModal2').on('show.bs.modal', function (event) {
+                    var button = $(event.relatedTarget)
+                    var recipient = button.data('whatever')
+
+                    var modal = $(this)
+                    modal.find('.modal-title').text('지도');
+                    modal.find('.modal-body').html("<iframe src=\""+recipient+"\" style=\"zoom:0.60\" frameborder=\"0\" height=\"100%\" width=\"100%\"></iframe>")
                 });
             });
             function searchKeyword(keyword, page){
@@ -62,6 +118,8 @@
                     tableData += "  <td>"+data.place_name+"</td>";
                     tableData += "  <td>"+data.road_address_name+"</td>";
                     tableData += "  <td>"+data.address_name+"</td>";
+                    tableData += "  <td><button id=\"detail_view\" type=\"button\" class=\"btn btn-primary\" data-toggle=\"modal\" data-target=\"#exampleModal\" data-whatever="+data.place_url+">상세</button></td>";
+                    tableData += "  <td><button id=\"detail_view\" type=\"button\" class=\"btn btn-primary\" data-toggle=\"modal\" data-target=\"#exampleModal2\" data-whatever=\"https://map.kakao.com/link/map/"+data.id+"\">지도</button></td>";
                     tableData += "</tr>";
                 });
                 $('#tableBody').html(tableData);
