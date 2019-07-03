@@ -6,6 +6,7 @@
         </div>
     </div>
 
+
     <div class="table">
         <table class="table">
             <thead class="thead-dark">
@@ -21,64 +22,83 @@
     <nav aria-label="..." style="text-align: center;" id="tableNav"></nav>
 
     <th:block layout:fragment="script">
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $("#keyword_search").click(function() {
-                    searchKeyword($("#keyword").val(), 1);
-                });
-            });
-            function searchKeyword(keyword, page){
-                $.ajax({
-                    type: "GET",
-                    contentType: "application/json",
-                    url: "/api/search",
-                    data: {"keyword":keyword, "page":page},
-                    success: function (data) {
-                        makeTable(data);
-                        makeTableNav(data);
-
-                        console.log("SUCCESS : ", data);
-
-                        $("#btn-search").prop("disabled", false);
-
-                    },
-                    error: function (e) {
-
-                        var json = "<h4>Ajax Response</h4><pre>"
-                            + e.responseText + "</pre>";
-                        $('#feedback').html(json);
-
-                        console.log("ERROR : ", e);
-                        $("#btn-search").prop("disabled", false);
-
-                    }
-                });
-            }
-            function makeTable(jsonData){
-                var tableData = "";
-
-                jsonData['documents'].forEach(function(data){
-                    tableData += "<tr>";
-                    tableData += "  <td>"+data.place_name+"</td>";
-                    tableData += "  <td>"+data.road_address_name+"</td>";
-                    tableData += "  <td>"+data.address_name+"</td>";
-                    tableData += "</tr>";
-                });
-                $('#tableBody').html(tableData);
-            }
-            function makeTableNav(jsonData){
-                var tableNavData = "";
-                var totalPage = jsonData['meta'].pageable_count;
-                var currentPage = jsonData['page'];
-
-                tableNavData += "<ul class=\"pagination\" th:with=\"start=${T(Math).floor("+currentPage+"/10)*10 + 1}, last=(${start + 9 < "+totalPage+" ? start + 9 : "+totalPage+"})\">";
-                tableNavData += "   <li class='disabled'>";
-                tableNavData += "       <a class=\"page-link\" th:onclick=\"|javascript:searchKeyword("+$("#keyword").val()+","+currentPage+")|\">Previous</a>";
-                tableNavData += "   </li>";
-                tableNavData += "</ul>";
-
-                $('#tableNav').html(tableNavData);
-            }
-        </script>
     </th:block>
 </div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#keyword_search").click(function() {
+            searchKeyword($("#keyword").val(), 1);
+        });
+    });
+    function searchKeyword(keyword, page){
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/search",
+            data: {"keyword":keyword, "page":page},
+            success: function (data) {
+                makeTable(data);
+                makeTableNav(data);
+
+                console.log("SUCCESS : ", data);
+
+                $("#btn-search").prop("disabled", false);
+
+            },
+            error: function (e) {
+
+                var json = "<h4>Ajax Response</h4><pre>"
+                    + e.responseText + "</pre>";
+                $('#feedback').html(json);
+
+                console.log("ERROR : ", e);
+                $("#btn-search").prop("disabled", false);
+
+            }
+        });
+    }
+    function makeTable(jsonData){
+        var tableData = "";
+
+        jsonData['documents'].forEach(function(data){
+            tableData += "<tr>";
+            tableData += "  <td>"+data.place_name+"</td>";
+            tableData += "  <td>"+data.road_address_name+"</td>";
+            tableData += "  <td>"+data.address_name+"</td>";
+            tableData += "</tr>";
+        });
+        $('#tableBody').html(tableData);
+    }
+    function makeTableNav(jsonData){
+        var tableNavData = "";
+        var totalPage = jsonData['meta'].pageable_count;
+        var currentPage = jsonData['page'];
+        var firstPage = (((currentPage - 1) / 10) * 10) + 1;
+        var lastPage = (((currentPage - 1) / 10) * 10) + 10;
+        if (lastPage >= totalPage) {
+            lastPage = totalPage;
+        }
+
+        // tableNavData += "<ul class=\"pagination\" th:with=\"start=${T(Math).floor("+currentPage+"/10)*10 + 1}, last=(${start + 9 < "+totalPage+" ? start + 9 : "+totalPage+"})\">";
+        tableNavData += "<ul class=\"pagination\">";
+        if (firstPage - 1 > 0) {
+            tableNavData += "   <li class='disabled'>";
+            tableNavData += "       <a class=\"page-link\" href=\"javascript:searchKeyword(\'"+$("#keyword").val() + "\', "+ (firstPage - 1) + ")\"> Prev </a>";
+            tableNavData += "   </li>";
+        }
+
+        for (var i = firstPage; i <= lastPage; i++) {
+            tableNavData += "   <li class='disabled'>";
+            tableNavData += "       <a class=\"page-link\" href=\"javascript:searchKeyword(\'"+$("#keyword").val() + "\', "+ i + ")\">" + i + "</a>";
+            tableNavData += "   </li>";
+        }
+        if (lastPage < totalPage) {
+            tableNavData += "   <li class='disabled'>";
+            tableNavData += "       <a class=\"page-link\" href=\"javascript:searchKeyword(\'"+$("#keyword").val() + "\', "+ (lastPage + 1) + ")\"> Next </a>";
+            tableNavData += "   </li>";
+        }
+
+        tableNavData += "</ul>";
+        $('#tableNav').html(tableNavData);
+    }
+</script>
