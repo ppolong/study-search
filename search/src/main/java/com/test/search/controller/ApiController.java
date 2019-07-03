@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @RestController
@@ -28,7 +27,7 @@ public class ApiController extends BaseController {
     }
 
     @GetMapping(value = "/api/search/history")
-    public Object getAjaxSearchHistoryByUserId(Pageable pageable, HttpServletRequest httpServletRequest) {
+    public Object getAjaxSearchHistoryByUserId(Pageable pageable) {
         Optional<String> userName = getUserName();
         if (!userName.isPresent()) {
             throw new IllegalStateException("not found user");
