@@ -31,6 +31,7 @@ public class KeywordService {
     private KeywordHistoryDao keywordHistoryDao;
 
     public Object getAjaxSearch(String keyword, Pageable pageable, HttpServletRequest httpServletRequest){
+        pageable = PageRequest.of(pageable.getPageNumber(), 10);
         if(Strings.isBlank(keyword) || (pageable.getPageNumber() < 1 || pageable.getPageNumber() > 45) || (pageable.getPageSize() < 1 || pageable.getPageSize() > 15)){
             return null;
         }
@@ -57,6 +58,8 @@ public class KeywordService {
         return responseEntity;
     }
     public Object getAjaxSearchHistoryByUserId(Pageable pageable, HttpServletRequest httpServletRequest){
+        pageable = PageRequest.of(pageable.getPageNumber(), 10);
+
         String userId = httpServletRequest.getRemoteUser();
 
         int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1);
