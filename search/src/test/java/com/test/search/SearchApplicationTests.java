@@ -39,8 +39,6 @@ public class SearchApplicationTests extends HttpServlet {
 
     private String keyword;
 
-    private HttpServletRequest httpServletRequest = null;
-
     @Autowired
     private KeywordService keywordService;
 
