@@ -5,10 +5,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-public class IndexController {
+public class IndexController extends BaseController {
 
     @RequestMapping(value = {"/main", "/"})
-    public String test(){
+    public String test() {
         return "main";
     }
 

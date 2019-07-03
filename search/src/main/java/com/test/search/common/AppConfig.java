@@ -1,42 +1,44 @@
 package com.test.search.common;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.AIMDBackoffManager;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultBackoffStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class AppConfig{
-    @Value("${restTemplate.factory.readTimeout}")
-    private int READ_TIMEOUT;
-
-    @Value("${restTemplate.factory.connectionTimeout}")
-    private int CONNECT_TIMEOUT;
-
-    @Value("${restTemplate.httpClient.maxConnection}")
-    private int MAX_CONN_TOTAL;
-
-    @Value("${restTemplate.httpClient.maxConnectionPerRoute}")
-    private int MAX_CONN_PER_ROUTE;
 
     @Bean
-    public RestTemplate restTemplate() {
-
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setReadTimeout(READ_TIMEOUT);
-        factory.setConnectTimeout(CONNECT_TIMEOUT);
-
-        CloseableHttpClient httpClient = HttpClientBuilder.create()
-                .setMaxConnTotal(MAX_CONN_TOTAL)
-                .setMaxConnPerRoute(MAX_CONN_PER_ROUTE)
-                .build();
-
-        factory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(factory);
-
-        return restTemplate;
+    public RestTemplateCustomizer restTemplateCustomizer(HttpClient httpClient) {
+        return restTemplate -> {
+            final ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
+            if (requestFactory instanceof HttpComponentsClientHttpRequestFactory) {
+                final HttpComponentsClientHttpRequestFactory factory = (HttpComponentsClientHttpRequestFactory) requestFactory;
+                factory.setConnectTimeout(3000);
+                factory.setReadTimeout(5000);
+                factory.setHttpClient(httpClient);
+            }
+        };
     }
+
+
+    @Bean(destroyMethod = "close")
+    public CloseableHttpClient httpClient() {
+        PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
+        connManager.setMaxTotal(10);
+        connManager.setDefaultMaxPerRoute(5);
+        return HttpClientBuilder.create()
+                .setConnectionManager(connManager)
+                .setBackoffManager(new AIMDBackoffManager(connManager))
+                .setConnectionBackoffStrategy(new DefaultBackoffStrategy())
+                .build();
+    }
+
 }
