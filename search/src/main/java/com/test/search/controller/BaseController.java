@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public class BaseController {
 
-    Optional<String> getUserName() {
+    String getUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            return Optional.of(userDetails.getUsername());
+            return userDetails.getUsername();
         }
-        return Optional.empty();
+        return "";
     }
 
 }
