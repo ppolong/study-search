@@ -1,51 +1,84 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="UTF-8">
-    <title>main</title>
-</head>
-<body>
-    <span th:inline="text">[[${#httpServletRequest.remoteUser}]] 님</span>
-    <form th:action="@{/logout}" method="post">
-        <input type="submit" value="Sign Out"/>
-    </form>
-    <div><label> 검색어 : <input type="text" id="keyword"/> </label></div>
-    <div><input type="button" value="검색" id="keyword_search"/></div>
-    <script type="text/javascript" src="webjars/jquery/3.4.1/dist/jquery.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $("#keyword_search").click(function() {
-                    $.ajax({
-                        type: "GET",
-                        contentType: "application/json",
-                        url: "/api/search",
-                        // data: JSON.stringify(keyword),
-                        data: {"keyword":$("#keyword").val()},
-                        cache: true,
-                        timeout: 2000,
-                        success: function (data) {
+<div layout:fragment="content" xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml" layout:decorator="fragments/layout">
+    <div class="input-group mb-3">
+        <input type="text" id="keyword" class="form-control" placeholder="검색어" aria-label="검색어" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="keyword_search">Button</button>
+        </div>
+    </div>
 
-                            var json = "<h4>Ajax Response</h4><pre>"
-                                + JSON.stringify(data, null, 4) + "</pre>";
-                            $('#feedback').html(json);
+    <div class="table">
+        <table class="table">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">장소명</th>
+                <th scope="col">도로명</th>
+                <th scope="col">지번</th>
+            </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+    <nav aria-label="..." style="text-align: center;" id="tableNav"></nav>
 
-                            console.log("SUCCESS : ", data);
-                            $("#btn-search").prop("disabled", false);
-
-                        },
-                        error: function (e) {
-
-                            var json = "<h4>Ajax Response</h4><pre>"
-                                + e.responseText + "</pre>";
-                            $('#feedback').html(json);
-
-                            console.log("ERROR : ", e);
-                            $("#btn-search").prop("disabled", false);
-
-                        }
-                    });
+    <th:block layout:fragment="script">
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $("#keyword_search").click(function() {
+                    searchKeyword($("#keyword").val(), 1);
+                });
             });
-        });
-    </script>
-</body>
-</html>
+            function searchKeyword(keyword, page){
+                $.ajax({
+                    type: "GET",
+                    contentType: "application/json",
+                    url: "/api/search",
+                    data: {"keyword":keyword, "page":page},
+                    success: function (data) {
+                        makeTable(data);
+                        makeTableNav(data);
+
+                        console.log("SUCCESS : ", data);
+
+                        $("#btn-search").prop("disabled", false);
+
+                    },
+                    error: function (e) {
+
+                        var json = "<h4>Ajax Response</h4><pre>"
+                            + e.responseText + "</pre>";
+                        $('#feedback').html(json);
+
+                        console.log("ERROR : ", e);
+                        $("#btn-search").prop("disabled", false);
+
+                    }
+                });
+            }
+            function makeTable(jsonData){
+                var tableData = "";
+
+                jsonData['documents'].forEach(function(data){
+                    tableData += "<tr>";
+                    tableData += "  <td>"+data.place_name+"</td>";
+                    tableData += "  <td>"+data.road_address_name+"</td>";
+                    tableData += "  <td>"+data.address_name+"</td>";
+                    tableData += "</tr>";
+                });
+                $('#tableBody').html(tableData);
+            }
+            function makeTableNav(jsonData){
+                var tableNavData = "";
+                var totalPage = jsonData['meta'].pageable_count;
+                var currentPage = jsonData['page'];
+
+                tableNavData += "<ul class=\"pagination\" th:with=\"start=${T(Math).floor("+currentPage+"/10)*10 + 1}, last=(${start + 9 < "+totalPage+" ? start + 9 : "+totalPage+"})\">";
+                tableNavData += "   <li class='disabled'>";
+                tableNavData += "       <a class=\"page-link\" th:onclick=\"|javascript:searchKeyword("+$("#keyword").val()+","+currentPage+")|\">Previous</a>";
+                tableNavData += "   </li>";
+                tableNavData += "</ul>";
+
+                $('#tableNav').html(tableNavData);
+            }
+        </script>
+    </th:block>
+</div>

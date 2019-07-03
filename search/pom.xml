@@ -16,6 +16,8 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <jquery.version>3.4.1</jquery.version>
+        <bootstrap.version>4.3.1</bootstrap.version>
     </properties>
 
     <dependencies>
@@ -52,11 +54,24 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- thymeleaf layout -->
+        <dependency>
+            <groupId>nz.net.ultraq.thymeleaf</groupId>
+            <artifactId>thymeleaf-layout-dialect</artifactId>
+        </dependency>
+
         <!-- jQuery -->
         <dependency>
             <groupId>org.webjars.bower</groupId>
             <artifactId>jquery</artifactId>
-            <version>3.4.1</version>
+            <version>${jquery.version}</version>
+        </dependency>
+
+        <!-- bootstrap -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>${bootstrap.version}</version>
         </dependency>
 
         <!-- APACHE HTTP CLIENT -->

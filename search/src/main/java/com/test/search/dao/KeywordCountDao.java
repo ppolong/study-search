@@ -1,9 +1,13 @@
 package com.test.search.dao;
 
 import com.test.search.domain.KeywordCount;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 
-public interface KeywordCountDao extends JpaRepository<KeywordCount, Integer> {
-    @Override
-    <S extends KeywordCount> S save(S s);
+import java.util.List;
+
+public interface KeywordCountDao extends CrudRepository<KeywordCount, Long> {
+    List<KeywordCount> findTop10ByOrderByCountDesc();
+//    @Modifying
+//    @Query("update TB_SEARCH_KEYWORD_COUNT set count = (count + 1) where keyword = :keyword")
+//    Integer updateKeywordCount(@Param(value="keyword") String keyword);
 }

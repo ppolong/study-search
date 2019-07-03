@@ -1,6 +1,5 @@
 package com.test.search.common;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -25,15 +24,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-                .antMatchers("/resources/**");
+                .antMatchers("/resources/**","/webjars/**","/static/**");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
+                .antMatchers("/api/**").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/login","/error","/").permitAll()
+                .antMatchers("/login","/error").permitAll()
                 .antMatchers("/main").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
