@@ -13,4 +13,8 @@
  
  * **bootstrap** : 화면 구현
  
+ ### Test ID  PWD : admin / admin1234
+ 
  ### Download link : https://github.com/ppolong/study-search/blob/master/search/test_jar/search-0.0.1-SNAPSHOT.jar
+ 
+ 
